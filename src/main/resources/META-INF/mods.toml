@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[33,)"
+loaderVersion = "[37,)"
 license = "MIT"
 issueTrackerURL = "https://github.com/CorgiTaco/lazydfu/issues"
 [[mods]]
@@ -13,9 +13,3 @@ authors = "tuxed"
 description = '''
 Makes DataFixerUpper more lazy
 '''
-[[dependencies.lazydfu]]
-modId = "forge"
-mandatory = true
-versionRange = "[33.0.0,)"
-ordering = "NONE"
-side = "BOTH"

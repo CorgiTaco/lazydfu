@@ -1,10 +1,15 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+        jcenter()
         mavenCentral()
+        maven {url='https://repo.spongepowered.org/repository/maven-public/'}
+
+
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
@@ -15,7 +20,7 @@ version = "${mod_version}"
 group = "tuxed.${modid}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "${modid}"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16) // Need this here so eclipse task generates correctly.
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
     mappings channel: "official", version: "${mc_version}"
@@ -25,6 +30,7 @@ minecraft {
     runs {
         client {
             workingDirectory project.file('run')
+            arg "-mixin.config="+archivesBaseName+".mixins.json"
 
 
             // Recommended logging level for the console
@@ -39,6 +45,7 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
+            arg "-mixin.config="+archivesBaseName+".mixins.json"
 
             property 'forge.logging.console.level', 'debug'
 
@@ -53,6 +60,7 @@ minecraft {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+//    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor' //Re-enable when building jar
 }
 
 jar {
@@ -65,6 +73,7 @@ jar {
                 "Implementation-Version": "${version}",
                 "Implementation-Vendor" :"${modid}",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                "MixinConfigs": "${modid}.mixins.json",
         ])
     }
 }
@@ -89,6 +98,12 @@ publishing {
             url "file:///${project.projectDir}/mcmodsrepo"
         }
     }
+}
+
+apply plugin: 'org.spongepowered.mixin'
+
+mixin {
+    add sourceSets.main, "${modid}.refmap.json"
 }
 
 tasks.withType(JavaCompile) {
